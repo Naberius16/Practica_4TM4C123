@@ -33,3 +33,19 @@ extern void Configurar_UART0(void)
     //Disable UART0 UART Control (UARTCTL) pag.918
     UART0->CTL = (1<<0) | (1<<8) | (1<<9);
 }
+//Para enviar dato/caracter
+extern void printChar(char c)
+{
+    while((UART0->FR & (1<<5)) != 0 );
+    UART0->DR = c;
+}
+
+//Enviar datos en cadena
+extern void printString(char* string)
+{
+    while(*string)
+    {
+        printChar(*(string++));
+    }
+    printChar('\n');
+}

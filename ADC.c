@@ -30,9 +30,9 @@ extern void Configura_Reg_ADC(void)
     GPIOE_AHB->DIR = (0<<1) | (0<<5); // PE1 y PE5
     GPIOD_AHB->DIR = (0<<0) | (0<<1) | (0<<3); // PD0, PD1 y PD3
     //(GPIOAFSEL) pag.672 Indicar que esos pines trabajan con función alternativa 
-    GPIOB_AHB->AFSEL = (0<<5); // PB5
-    GPIOE_AHB->AFSEL = (0<<1) | (0<<5); // PE1 y PE5
-    GPIOD_AHB->AFSEL = (0<<0) | (0<<1) | (0<<3); // PD0, PD1 y PD3
+    GPIOB_AHB->AFSEL = (1<<5); // PB5
+    GPIOE_AHB->AFSEL = (1<<1) | (1<<5); // PE1 y PE5
+    GPIOD_AHB->AFSEL = (1<<0) | (1<<1) | (1<<3); // PD0, PD1 y PD3
     //(GPIODEN) pag.683 desabilita el modo digital de los pines porque son analogicos
     GPIOB_AHB->DEN = (0<<5); // PB5
     GPIOE_AHB->DEN = (0<<1) | (0<<5); // PE1 y PE5
@@ -42,9 +42,9 @@ extern void Configura_Reg_ADC(void)
     GPIOE_AHB->PCTL = GPIOE_AHB->PCTL & (0xFF0FFF0F); //Poner 0 en los bits de los pines 1 y 5
     GPIOD_AHB->PCTL = GPIOD_AHB->PCTL & (0xFFFF0F00); //Poner 0 en los bits de los pines 0, 1 y 3 
     //(GPIOAMSEL) pag.687 habilitar analogico los pines de los canales
-    GPIOB_AHB->AMSEL = (0<<5); // PB5
-    GPIOE_AHB->AMSEL = (0<<1) | (0<<5); // PE1 y PE5
-    GPIOD_AHB->AMSEL = (0<<0) | (0<<1) | (0<<3); // PD0, PD1 y PD3
+    GPIOB_AHB->AMSEL = (1<<5); // PB5
+    GPIOE_AHB->AMSEL = (1<<1) | (1<<5); // PE1 y PE5
+    GPIOD_AHB->AMSEL = (1<<0) | (1<<1) | (1<<3); // PD0, PD1 y PD3
     //Pag 891 El registro (ADCPC) establece la velocidad de conversión por segundo
     ADC0->PC = (0<<3)|(1<<2)|(1<<1)|(1<<0);//1Mms  Se pone 7 en binario para trabajar con la max. velocidad
     ADC1->PC = (0<<3)|(1<<2)|(1<<1)|(1<<0);//1Mms
@@ -76,4 +76,15 @@ extern void Configura_Reg_ADC(void)
     ADC1->ACTSS = (1<<3) | (1<<2) | (0<<1) | (0<<0); // se habilita el sec. 2 y 3 
     ADC0->PSSI |= (1<<0); //Inicializa el sec. 0 cuando se configura el ADC en modo de procesador
     ADC1->PSSI |= (1<<2) | (1<<3); //Inicializa el sec. 2 y 3
+}
+//  Adquisición del ADC 0 y sec. 1
+extern void ADC0_InSeq1(uint16_t *Result)
+{
+       ADC0->PSSI = (1<<1);  // Se habilita modo de configuración
+       while((ADC0->RIS & 0x02)==0){}; 
+       Result[0] = ADC0->SSFIFO1&0xFFF; // Se almacenan las muestras
+       Result[1] = ADC0->SSFIFO1&0xFFF;  
+       Result[2] = ADC0->SSFIFO1&0xFFF;
+       ADC0->ISC = 0x0002;  //Conversion finalizada
+
 }
