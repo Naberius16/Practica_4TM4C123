@@ -5,6 +5,29 @@
 #include "lib/include.h"
 extern void Configurar_GPIO(void)
 {
+    SYSCTL->RCGCGPIO |=(1<<5); 
+    GPIOF->LOCK= 0x4C4F434B;   // 2) unlock GPIO Port F
+    GPIOF->CR = 0x1F;           // allow changes to PF4-0
+    GPIOF->AMSEL = 0x00;        // 3) disable analog on PF
+    GPIOF->PCTL = 0x00000000;   // 4) PCTL GPIO on PF4-0
+    GPIOF->DIR = 0x0E;          // 5) PF4,PF0 in, PF3-1 out
+    GPIOF->AFSEL = 0x00;        // 6) disable alt funct on PF7-0
+    GPIOF->PUR = 0x11;          // enable pull-up on PF0 and PF4
+    GPIOF->DEN = 0x1F;          // 7) enable digital I/O on PF4-0
+}
+
+extern void Delay(void)
+{
+  unsigned long volatile time;
+  time = 1600000;
+  while(time)
+  {
+		time--;
+  }
+}
+
+/*extern void Configurar_GPIO(void)
+{
     //Se habilita el puerto a usar 
     SYSCTL->RCGCGPIO |=(1<<0);  //pueto A
     //Desabilita la función analogica del puerto para funcionar como GPIO pag. 687
@@ -91,4 +114,4 @@ extern void GPIOA_INT_ISR(void)
       ADC1->ISC = 0x0008;  
     }
     GPIOA ->ICR |=(1<<0) | (1<<1) | (1<<2) | (1<<3) | (1<<4) | (1<<5); 
-}
+}*/

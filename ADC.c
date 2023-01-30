@@ -77,14 +77,30 @@ extern void Configura_Reg_ADC(void)
     ADC0->PSSI |= (1<<0); //Inicializa el sec. 0 cuando se configura el ADC en modo de procesador
     ADC1->PSSI |= (1<<2) | (1<<3); //Inicializa el sec. 2 y 3
 }
-//  Adquisición del ADC 0 y sec. 1
-extern void ADC0_InSeq1(uint16_t *Result)
-{
-       ADC0->PSSI = (1<<1);  // Se habilita modo de configuración
-       while((ADC0->RIS & 0x02)==0){}; 
-       Result[0] = ADC0->SSFIFO1&0xFFF; // Se almacenan las muestras
-       Result[1] = ADC0->SSFIFO1&0xFFF;  
-       Result[2] = ADC0->SSFIFO1&0xFFF;
-       ADC0->ISC = 0x0002;  //Conversion finalizada
 
+extern void ADC0_InSeq1(uint16_t Result[6])
+{
+       ADC0->PSSI = 0x00000002;
+       while((ADC0->RIS&0x02)==0){}; 
+       Result[0] = ADC0->SSFIFO1&0xFFF; 
+       Result[1] = ADC0->SSFIFO1&0xFFF;
+       Result[2] = ADC0->SSFIFO1&0xFFF;
+       ADC0->ISC = 0x0002; 
+}
+
+extern void ADC1_InSeq2(uint16_t Result[6])
+{
+       ADC1->PSSI = 0x00000004;
+       while((ADC1->RIS&0x04)==0){}; 
+       Result[3] = ADC1->SSFIFO2&0xFFF; 
+       Result[4] = ADC1->SSFIFO2&0xFFF; 
+       ADC1->ISC = 0x0004;  
+}
+
+extern void ADC1_InSeq3(uint16_t Result[6])
+{
+       ADC1->PSSI = 0x00000008;  
+       while((ADC1->RIS&0x08)==0){}; 
+       Result[5] = ADC1->SSFIFO3&0xFFF; 
+       ADC1->ISC = 0x0008;
 }
